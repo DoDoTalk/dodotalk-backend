@@ -5,3 +5,9 @@ pluginManagement {
     }
 }
 rootProject.name = "dodotalk"
+
+include("app")
+include("user")
+include("chat")
+include("notification")
+include("common")
