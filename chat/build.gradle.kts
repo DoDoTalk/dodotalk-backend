@@ -1,9 +1,11 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.jpa)
-    alias(libs.plugins.spring.boot)
-    alias(libs.plugins.spring.dependency.management)
-    alias(libs.plugins.kotlin.spring)
+    /**
+     * "java-library"는 gradle에게 다른 모듈에게 기능을 제공하는 library 모듈임을 명시
+     * main function의 entryPoint 혹은 실행할 수 있는(executable) 모듈이 아님
+     */
+    id("java-library")
+    id("dodotalk.spring-boot-service")
+    kotlin("plugin.jpa")
 }
 
 group = "com.dothebestmayb"
@@ -15,6 +17,8 @@ repositories {
 }
 
 dependencies {
+    implementation(projects.common)
+
     testImplementation(kotlin("test"))
 }
 
