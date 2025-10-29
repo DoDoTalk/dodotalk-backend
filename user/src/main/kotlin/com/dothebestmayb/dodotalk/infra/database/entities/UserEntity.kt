@@ -1,6 +1,6 @@
-package com.dothebestmayb.user.infra.database.entities
+package com.dothebestmayb.dodotalk.infra.database.entities
 
-import com.dothebestmayb.user.domain.model.UserId
+import com.dothebestmayb.dodotalk.domain.model.UserId
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue

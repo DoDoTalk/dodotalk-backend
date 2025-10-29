@@ -1,4 +1,4 @@
-package com.dothebestmayb.user.domain.model
+package com.dothebestmayb.dodotalk.domain.model
 
 /**
  * 로그인한 사용자 정보

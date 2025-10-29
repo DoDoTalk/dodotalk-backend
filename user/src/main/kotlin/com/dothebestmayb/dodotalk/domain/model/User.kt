@@ -1,4 +1,4 @@
-package com.dothebestmayb.user.domain.model
+package com.dothebestmayb.dodotalk.domain.model
 
 import java.util.UUID
 
