@@ -2,6 +2,7 @@ package com.dothebestmayb.dodotalk.api.controllers
 
 import com.dothebestmayb.dodotalk.api.dto.AuthenticatedUserDto
 import com.dothebestmayb.dodotalk.api.dto.LoginRequest
+import com.dothebestmayb.dodotalk.api.dto.RefreshRequest
 import com.dothebestmayb.dodotalk.api.dto.RegisterRequest
 import com.dothebestmayb.dodotalk.api.dto.UserDto
 import com.dothebestmayb.dodotalk.api.mappers.toAuthenticatedUserDto
@@ -36,5 +37,14 @@ class AuthController(private val authService: AuthService) {
             email = body.email,
             password = body.password
         ).toAuthenticatedUserDto()
+    }
+
+    @PostMapping("/refresh")
+    fun refresh(
+        @RequestBody body: RefreshRequest
+    ): AuthenticatedUserDto {
+        return authService
+            .refresh(body.refreshToken)
+            .toAuthenticatedUserDto()
     }
 }
