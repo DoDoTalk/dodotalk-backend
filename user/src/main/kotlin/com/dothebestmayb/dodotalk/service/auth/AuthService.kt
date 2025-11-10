@@ -49,9 +49,11 @@ class AuthService(
         password: String,
     ): AuthenticatedUser {
         val user = userRepository.findByEmail(email.trim())
-            ?: throw InvalidCredentialsException()
 
-        if (!passwordEncoder.matches(password, user.hashedPassword)) {
+        val passwordHash = user?.hashedPassword ?: DUMMY_PASSWORD_HASH
+        val passwordMatches = passwordEncoder.matches(password, passwordHash)
+
+        if (user == null || !passwordMatches) {
             throw InvalidCredentialsException()
         }
 
@@ -90,5 +92,12 @@ class AuthService(
         val hashBytes = digest.digest(token.encodeToByteArray())
 
         return Base64.getEncoder().encodeToString(hashBytes)
+    }
+
+    companion object {
+        // pre-computed Bcrypt hash of "dodotalk-password-to-prevent-timing-attack-from-hacker"
+        // Uses cost factor 10 (2^10 rounds) to match production password encoder settings
+        // This ensures constant-time authentication regardless of whether user exists
+        private const val DUMMY_PASSWORD_HASH = "\$2a\$10\$VGAtbsYqzXGxxQ3N6NW4pOrulLW8TqTgcQkyylrjZVN4KWM.V7ncG"
     }
 }
