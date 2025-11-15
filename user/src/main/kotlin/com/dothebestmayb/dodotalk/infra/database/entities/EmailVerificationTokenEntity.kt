@@ -1,5 +1,6 @@
 package com.dothebestmayb.dodotalk.infra.database.entities
 
+import com.dothebestmayb.dodotalk.infra.security.TokenGenerator
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -22,7 +23,7 @@ class EmailVerificationTokenEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,
     @Column(nullable = false, unique = true)
-    var token: String,
+    var token: String = TokenGenerator.generateSecureToken(),
     @Column(nullable = false)
     var expiresAt: Instant,
     @ManyToOne(fetch = FetchType.LAZY) // EmailVerificationTokenEntity가 생성된 후, user property에 접근이 발생해야 Join이 수행됨
