@@ -1,5 +1,6 @@
 package com.dothebestmayb.dodotalk.service.auth
 
+import com.dothebestmayb.dodotalk.domain.exception.EmailNotVerifiedException
 import com.dothebestmayb.dodotalk.domain.exception.InvalidCredentialsException
 import com.dothebestmayb.dodotalk.domain.exception.InvalidTokenException
 import com.dothebestmayb.dodotalk.domain.exception.UserAlreadyExistsException
@@ -26,23 +27,30 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtService: JwtService,
     private val refreshTokenRepository: RefreshTokenRepository,
+    private val emailVerificationService: EmailVerificationService,
 ) {
 
+    @Transactional
     fun register(email: String, username: String, password: String): User {
+        val trimmedEmail = email.trim()
+
         val user = userRepository.findByEmailOrUsername(
-            email = email.trim(),
+            email = trimmedEmail,
             username = username.trim(),
         )
         if (user != null) {
             throw UserAlreadyExistsException()
         }
-        val savedUser = userRepository.save(
+
+        val savedUser = userRepository.saveAndFlush(
             UserEntity(
-                email = email.trim(),
+                email = trimmedEmail,
                 username = username.trim(),
                 hashedPassword = passwordEncoder.encode(password),
             )
         ).toUser()
+
+        val token = emailVerificationService.createVerificationToken(trimmedEmail)
 
         return savedUser
     }
@@ -60,7 +68,9 @@ class AuthService(
             throw InvalidCredentialsException()
         }
 
-        // TODO : check for verified email
+        if (!user.hasVerifiedEmail) {
+            throw EmailNotVerifiedException()
+        }
 
         return user.id?.let { userId ->
             val accessToken = jwtService.generateAccessToken(userId)
