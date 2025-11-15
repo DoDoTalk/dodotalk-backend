@@ -1,7 +1,9 @@
 package com.dothebestmayb.dodotalk.infra.database.entities
 
 import com.dothebestmayb.dodotalk.domain.model.UserId
+import com.dothebestmayb.dodotalk.infra.database.converters.EmailAttributeConverter
 import jakarta.persistence.Column
+import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -30,6 +32,7 @@ class UserEntity(
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: UserId? = null,
     @Column(nullable = false, unique = true)
+    @Convert(converter = EmailAttributeConverter::class)
     var email: String,
     @Column(nullable = false, unique = true)
     var username: String,
