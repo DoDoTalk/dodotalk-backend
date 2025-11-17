@@ -1,4 +1,4 @@
-package com.dothebestmayb.dodotalk.service.auth
+package com.dothebestmayb.dodotalk.service
 
 import com.dothebestmayb.dodotalk.domain.exception.InvalidTokenException
 import com.dothebestmayb.dodotalk.domain.model.UserId

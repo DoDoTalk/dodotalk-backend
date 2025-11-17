@@ -7,8 +7,8 @@ import com.dothebestmayb.dodotalk.api.dto.RegisterRequest
 import com.dothebestmayb.dodotalk.api.dto.UserDto
 import com.dothebestmayb.dodotalk.api.mappers.toAuthenticatedUserDto
 import com.dothebestmayb.dodotalk.api.mappers.toUserDto
-import com.dothebestmayb.dodotalk.service.auth.AuthService
-import com.dothebestmayb.dodotalk.service.auth.EmailVerificationService
+import com.dothebestmayb.dodotalk.service.AuthService
+import com.dothebestmayb.dodotalk.service.EmailVerificationService
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
