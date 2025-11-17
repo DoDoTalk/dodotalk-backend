@@ -3,6 +3,7 @@ package com.dothebestmayb.dodotalk.api.exception_handling
 import com.dothebestmayb.dodotalk.domain.exception.EmailNotVerifiedException
 import com.dothebestmayb.dodotalk.domain.exception.InvalidCredentialsException
 import com.dothebestmayb.dodotalk.domain.exception.InvalidTokenException
+import com.dothebestmayb.dodotalk.domain.exception.SamePasswordException
 import com.dothebestmayb.dodotalk.domain.exception.UserAlreadyExistsException
 import com.dothebestmayb.dodotalk.domain.exception.UserNotFoundException
 import org.springframework.http.HttpStatus
@@ -57,6 +58,15 @@ class AuthExceptionHandler {
         e: EmailNotVerifiedException
     ) = mapOf(
         "code" to "EMAIL_NOT_VERIFIED",
+        "message" to e.message,
+    )
+
+    @ExceptionHandler(SamePasswordException::class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    fun onSamePassword(
+        e: SamePasswordException
+    ) = mapOf(
+        "code" to "SAME_PASSWORD",
         "message" to e.message,
     )
 

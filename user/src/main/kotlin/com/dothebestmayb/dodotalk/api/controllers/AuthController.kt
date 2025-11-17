@@ -1,14 +1,18 @@
 package com.dothebestmayb.dodotalk.api.controllers
 
 import com.dothebestmayb.dodotalk.api.dto.AuthenticatedUserDto
+import com.dothebestmayb.dodotalk.api.dto.ChangePasswordRequest
+import com.dothebestmayb.dodotalk.api.dto.EmailRequest
 import com.dothebestmayb.dodotalk.api.dto.LoginRequest
 import com.dothebestmayb.dodotalk.api.dto.RefreshRequest
 import com.dothebestmayb.dodotalk.api.dto.RegisterRequest
+import com.dothebestmayb.dodotalk.api.dto.ResetPasswordRequest
 import com.dothebestmayb.dodotalk.api.dto.UserDto
 import com.dothebestmayb.dodotalk.api.mappers.toAuthenticatedUserDto
 import com.dothebestmayb.dodotalk.api.mappers.toUserDto
 import com.dothebestmayb.dodotalk.service.AuthService
 import com.dothebestmayb.dodotalk.service.EmailVerificationService
+import com.dothebestmayb.dodotalk.service.PasswordResetService
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -19,8 +23,10 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/auth")
-class AuthController(private val authService: AuthService,
-                     private val emailVerificationService: EmailVerificationService
+class AuthController(
+    private val authService: AuthService,
+    private val emailVerificationService: EmailVerificationService,
+    private val passwordResetService: PasswordResetService
 ) {
 
     @PostMapping("/register")
@@ -65,5 +71,29 @@ class AuthController(private val authService: AuthService,
         @RequestParam token: String
     ) {
         emailVerificationService.verifyEmail(token)
+    }
+
+    @PostMapping("/forgot-password")
+    fun forgotPassword(
+        @Valid @RequestBody body: EmailRequest
+    ) {
+        passwordResetService.requestPasswordReset(body.email)
+    }
+
+    @PostMapping("/reset-password")
+    fun resetPassword(
+        @Valid @RequestBody body: ResetPasswordRequest
+    ) {
+        passwordResetService.resetPassword(
+            token = body.token,
+            newPassword = body.newPassword,
+        )
+    }
+
+    @PostMapping("/change-password")
+    fun changePassword(
+        @Valid @RequestBody body: ChangePasswordRequest
+    ) {
+        // TODO : Extract request user Id and call service
     }
 }
