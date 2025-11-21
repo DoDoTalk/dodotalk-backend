@@ -7,6 +7,15 @@ spring:
   jackson:
     time-zone: Asia/Seoul
 
+  data:
+    redis:
+      host: "redis-14447.c340.ap-northeast-2-1.ec2.cloud.redislabs.com"
+      password: ${REDIS_PASSWORD}
+      username: "default"
+      port: 14447
+      connect-timeout: 5000ms
+      timeout: 2000ms
+
   datasource:
     url: jdbc:postgresql://aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres
     username: postgres.pykgjzoltroojlpnhpwi
