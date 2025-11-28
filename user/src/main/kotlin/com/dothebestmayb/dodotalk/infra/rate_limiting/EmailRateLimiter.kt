@@ -52,8 +52,6 @@ class EmailRateLimiter(
         action()
     }
 
-
-
     companion object {
         private const val EMAIL_RATE_LIMIT_PREFIX = "rate_limit:email"
         private const val EMAIL_ATTEMPT_COUNT_PREFIX = "email_attempt_count"

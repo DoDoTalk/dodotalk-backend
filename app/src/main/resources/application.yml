@@ -59,3 +59,11 @@ dodotalk:
       expiry-minutes: 30
   scheduling:
     time-zone: Asia/Seoul
+
+# client는 nginx에 요청을 보내고, nginx가 요청을 확인한 후 적절한 백엔드 서버에 요청을 다시 전달하도록 설정
+nginx:
+  trusted-ips:
+    - "127.0.0.1" # nginx on same machine
+    - "::1" # IPv6 localhost
+    - "172.17.0.0/16" # nginx container IP when using Docker
+    - "10.0.0.5/32" # nginx server IP (if separate machine)
