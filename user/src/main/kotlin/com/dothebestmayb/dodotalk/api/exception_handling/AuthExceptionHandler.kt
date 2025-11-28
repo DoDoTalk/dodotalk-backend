@@ -3,6 +3,7 @@ package com.dothebestmayb.dodotalk.api.exception_handling
 import com.dothebestmayb.dodotalk.domain.exception.EmailNotVerifiedException
 import com.dothebestmayb.dodotalk.domain.exception.InvalidCredentialsException
 import com.dothebestmayb.dodotalk.domain.exception.InvalidTokenException
+import com.dothebestmayb.dodotalk.domain.exception.RateLimitException
 import com.dothebestmayb.dodotalk.domain.exception.SamePasswordException
 import com.dothebestmayb.dodotalk.domain.exception.UserAlreadyExistsException
 import com.dothebestmayb.dodotalk.domain.exception.UserNotFoundException
@@ -67,6 +68,15 @@ class AuthExceptionHandler {
         e: SamePasswordException
     ) = mapOf(
         "code" to "SAME_PASSWORD",
+        "message" to e.message,
+    )
+
+    @ExceptionHandler(RateLimitException::class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    fun onRateLimitExceeded(
+        e: RateLimitException
+    ) = mapOf(
+        "code" to "RATE_LIMIT_EXCEEDED",
         "message" to e.message,
     )
 

@@ -21,6 +21,10 @@ class EmailVerificationService(
     @param:Value("\${dodotalk.email.verification.expiry-hours}") private val expiryHours: Long,
 ) {
 
+    fun resendVerificationEmail(email: String) {
+        // TODO: Trigger resend
+    }
+
     @Transactional
     fun createVerificationToken(email: String): EmailVerificationToken {
         val userEntity = userRepository.findByEmail(email)

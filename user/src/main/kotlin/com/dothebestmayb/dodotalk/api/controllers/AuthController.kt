@@ -10,6 +10,7 @@ import com.dothebestmayb.dodotalk.api.dto.ResetPasswordRequest
 import com.dothebestmayb.dodotalk.api.dto.UserDto
 import com.dothebestmayb.dodotalk.api.mappers.toAuthenticatedUserDto
 import com.dothebestmayb.dodotalk.api.mappers.toUserDto
+import com.dothebestmayb.dodotalk.infra.rate_limiting.EmailRateLimiter
 import com.dothebestmayb.dodotalk.service.AuthService
 import com.dothebestmayb.dodotalk.service.EmailVerificationService
 import com.dothebestmayb.dodotalk.service.PasswordResetService
@@ -26,7 +27,8 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(
     private val authService: AuthService,
     private val emailVerificationService: EmailVerificationService,
-    private val passwordResetService: PasswordResetService
+    private val passwordResetService: PasswordResetService,
+    private val emailRateLimiter: EmailRateLimiter,
 ) {
 
     @PostMapping("/register")
@@ -64,6 +66,17 @@ class AuthController(
         @RequestBody body: RefreshRequest
     ) {
         authService.logout(body.refreshToken)
+    }
+
+    @PostMapping("/resend-verification")
+    fun resendVerification(
+        @Valid @RequestBody body: EmailRequest,
+    ) {
+        emailRateLimiter.withRateLimit(
+            email = body.email,
+        ) {
+            emailVerificationService.resendVerificationEmail(body.email)
+        }
     }
 
     @GetMapping("/verify")
