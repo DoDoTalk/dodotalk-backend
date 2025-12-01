@@ -11,6 +11,7 @@ import com.dothebestmayb.dodotalk.api.dto.ResetPasswordRequest
 import com.dothebestmayb.dodotalk.api.dto.UserDto
 import com.dothebestmayb.dodotalk.api.mappers.toAuthenticatedUserDto
 import com.dothebestmayb.dodotalk.api.mappers.toUserDto
+import com.dothebestmayb.dodotalk.api.util.requestUserId
 import com.dothebestmayb.dodotalk.infra.rate_limiting.EmailRateLimiter
 import com.dothebestmayb.dodotalk.service.AuthService
 import com.dothebestmayb.dodotalk.service.EmailVerificationService
@@ -134,6 +135,10 @@ class AuthController(
     fun changePassword(
         @Valid @RequestBody body: ChangePasswordRequest
     ) {
-        // TODO : Extract request user Id and call service
+        passwordResetService.changePassword(
+            userId = requestUserId,
+            oldPassword = body.oldPassword,
+            newPassword = body.newPassword,
+        )
     }
 }

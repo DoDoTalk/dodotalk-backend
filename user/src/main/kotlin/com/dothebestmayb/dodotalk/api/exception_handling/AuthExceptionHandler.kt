@@ -5,6 +5,7 @@ import com.dothebestmayb.dodotalk.domain.exception.InvalidCredentialsException
 import com.dothebestmayb.dodotalk.domain.exception.InvalidTokenException
 import com.dothebestmayb.dodotalk.domain.exception.RateLimitException
 import com.dothebestmayb.dodotalk.domain.exception.SamePasswordException
+import com.dothebestmayb.dodotalk.domain.exception.UnauthorizedException
 import com.dothebestmayb.dodotalk.domain.exception.UserAlreadyExistsException
 import com.dothebestmayb.dodotalk.domain.exception.UserNotFoundException
 import org.springframework.http.HttpStatus
@@ -59,6 +60,15 @@ class AuthExceptionHandler {
         e: EmailNotVerifiedException
     ) = mapOf(
         "code" to "EMAIL_NOT_VERIFIED",
+        "message" to e.message,
+    )
+
+    @ExceptionHandler(UnauthorizedException::class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    fun onUnauthorized(
+        e: UnauthorizedException
+    ) = mapOf(
+        "code" to "UNAUTHORIZED",
         "message" to e.message,
     )
 
