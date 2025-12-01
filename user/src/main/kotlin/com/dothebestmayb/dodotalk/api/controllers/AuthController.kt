@@ -1,5 +1,6 @@
 package com.dothebestmayb.dodotalk.api.controllers
 
+import com.dothebestmayb.dodotalk.api.config.IpRateLimit
 import com.dothebestmayb.dodotalk.api.dto.AuthenticatedUserDto
 import com.dothebestmayb.dodotalk.api.dto.ChangePasswordRequest
 import com.dothebestmayb.dodotalk.api.dto.EmailRequest
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.util.concurrent.TimeUnit
 
 @RestController
 @RequestMapping("/api/auth")
@@ -32,6 +34,11 @@ class AuthController(
 ) {
 
     @PostMapping("/register")
+    @IpRateLimit(
+        requests = 10,
+        duration = 1L,
+        unit = TimeUnit.HOURS,
+    )
     fun register(
         @Valid @RequestBody body: RegisterRequest
     ): UserDto {
@@ -43,6 +50,11 @@ class AuthController(
     }
 
     @PostMapping("/login")
+    @IpRateLimit(
+        requests = 20,
+        duration = 1L,
+        unit = TimeUnit.HOURS,
+    )
     fun login(
         @RequestBody body: LoginRequest
     ): AuthenticatedUserDto {
@@ -53,6 +65,11 @@ class AuthController(
     }
 
     @PostMapping("/refresh")
+    @IpRateLimit(
+        requests = 10,
+        duration = 1L,
+        unit = TimeUnit.HOURS,
+    )
     fun refresh(
         @RequestBody body: RefreshRequest
     ): AuthenticatedUserDto {
@@ -69,6 +86,11 @@ class AuthController(
     }
 
     @PostMapping("/resend-verification")
+    @IpRateLimit(
+        requests = 10,
+        duration = 1L,
+        unit = TimeUnit.HOURS,
+    )
     fun resendVerification(
         @Valid @RequestBody body: EmailRequest,
     ) {
@@ -87,6 +109,11 @@ class AuthController(
     }
 
     @PostMapping("/forgot-password")
+    @IpRateLimit(
+        requests = 10,
+        duration = 1L,
+        unit = TimeUnit.HOURS,
+    )
     fun forgotPassword(
         @Valid @RequestBody body: EmailRequest
     ) {
