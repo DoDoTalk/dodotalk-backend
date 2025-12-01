@@ -25,10 +25,12 @@ class IpRateLimitInterceptor(
             val annotation = handler.getMethodAnnotation(IpRateLimit::class.java)
             if (annotation != null) {
                 val clientIp = ipResolver.getClientIp(request)
+                val path = request.requestURI
 
                 return try {
                     ipRateLimiter.withIpRateLimit(
                         ipAddress = clientIp,
+                        path = path,
                         resetsIn = Duration.of(
                             annotation.duration,
                             annotation.unit.toChronoUnit(),

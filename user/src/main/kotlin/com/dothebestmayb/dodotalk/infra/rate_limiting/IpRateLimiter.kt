@@ -25,11 +25,12 @@ class IpRateLimiter(
 
     fun <T>withIpRateLimit(
         ipAddress: String,
+        path: String,
         resetsIn: Duration,
         maxRequestsPerIp: Int,
         action: () -> T,
     ): T {
-        val key = "$IP_RATE_LIMIT_PREFIX:$ipAddress"
+        val key = "$IP_RATE_LIMIT_PREFIX:$path:$ipAddress"
 
         val result = redisTemplate.execute(
             rateLimitScript,
@@ -51,6 +52,6 @@ class IpRateLimiter(
     }
 
     companion object {
-        private const val IP_RATE_LIMIT_PREFIX = "rate_limit:ip"
+        private const val IP_RATE_LIMIT_PREFIX = "rate_limit:path:ip"
     }
 }
