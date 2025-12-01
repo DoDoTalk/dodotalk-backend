@@ -22,6 +22,7 @@ class SecurityConfig {
                     .requestMatchers("/api/auth/**")
                     .permitAll()
                     .dispatcherTypeMatchers(
+                        DispatcherType.ERROR, // 이 부분 수정함
                         DispatcherType.FORWARD
                     )
                     .permitAll()
