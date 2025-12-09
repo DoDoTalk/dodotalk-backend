@@ -47,6 +47,27 @@ spring:
         jdbc:
           time_zone: Asia/Seoul
 
+  rabbitmq:
+    host: chameleon.lmq.cloudamqp.com
+    password: ${RABBITMQ_PASSWORD}
+    username: amcwmlrt
+    ssl:
+      enabled: true
+    virtual-host: amcwmlrt
+    listener:
+      simple:
+        acknowledge-mode: auto
+        concurrency: 1 # free tier는 1개로만 설정 가능
+        max-concurrency: 3
+        prefetch: 10
+        default-requeue-rejected: true
+        retry:
+          enabled: true
+          initial-interval: 1000ms
+          max-interval: 10000ms
+          max-retries: 3
+          multiplier: 2 # retry interval 간격이 실패할 때마다 2배로 증가함
+
 jwt:
   secret: ${JWT_SECRET_BASE64}
   expiration-minutes: 15
