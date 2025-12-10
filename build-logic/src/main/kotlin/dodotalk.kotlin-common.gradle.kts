@@ -1,14 +1,23 @@
+import gradle.kotlin.dsl.accessors._1a4939bdc5f6e939f50d04029c2e9574.dependencyManagement
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
+    kotlin("plugin.spring")
+    id("io.spring.dependency-management")
 }
 
 repositories {
     mavenCentral()
     maven { url = uri("https://repo.spring.io/snapshot") }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${libraries.findVersion("spring-boot").get()}")
+    }
 }
 
 configure<KotlinJvmProjectExtension> {
