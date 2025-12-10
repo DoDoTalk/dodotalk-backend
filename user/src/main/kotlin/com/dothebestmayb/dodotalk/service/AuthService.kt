@@ -1,5 +1,6 @@
 package com.dothebestmayb.dodotalk.service
 
+import com.dothebestmayb.dodotalk.domain.events.user.UserEvent
 import com.dothebestmayb.dodotalk.domain.exception.EmailNotVerifiedException
 import com.dothebestmayb.dodotalk.domain.exception.InvalidCredentialsException
 import com.dothebestmayb.dodotalk.domain.exception.InvalidTokenException
@@ -13,6 +14,7 @@ import com.dothebestmayb.dodotalk.infra.database.entities.UserEntity
 import com.dothebestmayb.dodotalk.infra.database.mapper.toUser
 import com.dothebestmayb.dodotalk.infra.database.repositories.RefreshTokenRepository
 import com.dothebestmayb.dodotalk.infra.database.repositories.UserRepository
+import com.dothebestmayb.dodotalk.infra.message_queue.EventPublisher
 import com.dothebestmayb.dodotalk.infra.security.PasswordEncoder
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -28,6 +30,7 @@ class AuthService(
     private val jwtService: JwtService,
     private val refreshTokenRepository: RefreshTokenRepository,
     private val emailVerificationService: EmailVerificationService,
+    private val eventPublisher: EventPublisher,
 ) {
 
     @Transactional
@@ -51,6 +54,15 @@ class AuthService(
         ).toUser()
 
         val token = emailVerificationService.createVerificationToken(trimmedEmail)
+
+        eventPublisher.publish(
+            event = UserEvent.Created(
+                userId = savedUser.id,
+                email = savedUser.email,
+                username = savedUser.username,
+                verificationToken = token.token,
+            )
+        )
 
         return savedUser
     }

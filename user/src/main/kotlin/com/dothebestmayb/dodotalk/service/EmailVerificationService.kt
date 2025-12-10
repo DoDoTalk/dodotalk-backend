@@ -1,5 +1,6 @@
 package com.dothebestmayb.dodotalk.service
 
+import com.dothebestmayb.dodotalk.domain.events.user.UserEvent
 import com.dothebestmayb.dodotalk.domain.exception.InvalidTokenException
 import com.dothebestmayb.dodotalk.domain.exception.UserNotFoundException
 import com.dothebestmayb.dodotalk.domain.model.EmailVerificationToken
@@ -7,6 +8,7 @@ import com.dothebestmayb.dodotalk.infra.database.entities.EmailVerificationToken
 import com.dothebestmayb.dodotalk.infra.database.mapper.toEmailVerificationToken
 import com.dothebestmayb.dodotalk.infra.database.repositories.EmailVerificationTokenRepository
 import com.dothebestmayb.dodotalk.infra.database.repositories.UserRepository
+import com.dothebestmayb.dodotalk.infra.message_queue.EventPublisher
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -19,10 +21,25 @@ class EmailVerificationService(
     private val emailVerificationTokenRepository: EmailVerificationTokenRepository,
     private val userRepository: UserRepository,
     @param:Value("\${dodotalk.email.verification.expiry-hours}") private val expiryHours: Long,
+    private val eventPublisher: EventPublisher,
 ) {
 
+    @Transactional
     fun resendVerificationEmail(email: String) {
-        // TODO: Trigger resend
+        val token = createVerificationToken(email)
+
+        if (token.user.hasEmailVerified) {
+            return
+        }
+
+        eventPublisher.publish(
+            event = UserEvent.RequestResendVerification(
+                userId = token.user.id,
+                email = token.user.email,
+                username = token.user.username,
+                verificationToken = token.token,
+            )
+        )
     }
 
     @Transactional
