@@ -1,0 +1,103 @@
+spring:
+  application:
+    name: dodotalk-backend
+    admin:
+      enabled: true
+
+  jackson:
+    time-zone: Asia/Seoul
+
+  data:
+    redis:
+      host: "redis-14447.c340.ap-northeast-2-1.ec2.cloud.redislabs.com"
+      password: ${REDIS_PASSWORD}
+      username: "default"
+      port: 14447
+      connect-timeout: 5000ms
+      timeout: 2000ms
+
+  datasource:
+    url: jdbc:postgresql://aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres
+    username: postgres.pykgjzoltroojlpnhpwi
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 20_000
+      idle-timeout: 300_000
+      max-lifetime: 12_000_000
+      validation-timeout: 5_000
+      pool-name: SpringBootHikariCP
+      data-source-properties:
+        prepareThreshold: 5
+        prepareStatementCachedQueries: 256
+        prepareStatementCachedSizeMiB: 5
+
+        tcpKeepAlive: true
+        socketTimeout: 30
+        connectTimeout: 10
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        show_sql: true
+        jdbc:
+          time_zone: Asia/Seoul
+
+  mail:
+    host: smtp.mailgun.org
+    username: ${MAILGUN_USERNAME}
+    port: 587
+    password: ${MAILGUN_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  rabbitmq:
+    host: chameleon.lmq.cloudamqp.com
+    password: ${RABBITMQ_PASSWORD}
+    username: amcwmlrt
+    ssl:
+      enabled: true
+    virtual-host: amcwmlrt
+    listener:
+      simple:
+        acknowledge-mode: auto
+        concurrency: 1 # free tier는 1개로만 설정 가능
+        max-concurrency: 3
+        prefetch: 10
+        default-requeue-rejected: true
+        retry:
+          enabled: true
+          initial-interval: 1000ms
+          max-interval: 10000ms
+          max-retries: 3
+          multiplier: 2 # retry interval 간격이 실패할 때마다 2배로 증가함
+
+jwt:
+  secret: ${JWT_SECRET_BASE64}
+  expiration-minutes: 15
+
+dodotalk:
+  email:
+    from: ${MAILGUN_USERNAME}
+    verification:
+      expiry-hours: 1
+    reset-password:
+      expiry-minutes: 30
+  scheduling:
+    time-zone: Asia/Seoul
+
+# client는 nginx에 요청을 보내고, nginx가 요청을 확인한 후 적절한 백엔드 서버에 요청을 다시 전달하도록 설정
+nginx:
+  trusted-ips:
+    - "127.0.0.1" # nginx on same machine
+    - "::1" # IPv6 localhost
+    - "172.17.0.0/16" # nginx container IP when using Docker
+    - "10.0.0.5/32" # nginx server IP (if separate machine)
