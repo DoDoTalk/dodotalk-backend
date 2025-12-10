@@ -47,6 +47,18 @@ spring:
         jdbc:
           time_zone: Asia/Seoul
 
+  mail:
+    host: smtp.mailgun.org
+    username: ${MAILGUN_USERNAME}
+    port: 587
+    password: ${MAILGUN_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   rabbitmq:
     host: chameleon.lmq.cloudamqp.com
     password: ${RABBITMQ_PASSWORD}
