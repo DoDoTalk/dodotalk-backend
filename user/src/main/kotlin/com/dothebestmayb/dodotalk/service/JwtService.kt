@@ -1,7 +1,7 @@
 package com.dothebestmayb.dodotalk.service
 
 import com.dothebestmayb.dodotalk.domain.exception.InvalidTokenException
-import com.dothebestmayb.dodotalk.domain.model.UserId
+import com.dothebestmayb.dodotalk.domain.type.UserId
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys

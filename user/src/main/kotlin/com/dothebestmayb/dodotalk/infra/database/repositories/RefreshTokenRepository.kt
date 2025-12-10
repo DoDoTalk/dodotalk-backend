@@ -1,6 +1,6 @@
 package com.dothebestmayb.dodotalk.infra.database.repositories
 
-import com.dothebestmayb.dodotalk.domain.model.UserId
+import com.dothebestmayb.dodotalk.domain.type.UserId
 import com.dothebestmayb.dodotalk.infra.database.entities.RefreshTokenEntity
 import org.springframework.data.jpa.repository.JpaRepository
 

@@ -7,7 +7,7 @@ import com.dothebestmayb.dodotalk.domain.exception.UserAlreadyExistsException
 import com.dothebestmayb.dodotalk.domain.exception.UserNotFoundException
 import com.dothebestmayb.dodotalk.domain.model.AuthenticatedUser
 import com.dothebestmayb.dodotalk.domain.model.User
-import com.dothebestmayb.dodotalk.domain.model.UserId
+import com.dothebestmayb.dodotalk.domain.type.UserId
 import com.dothebestmayb.dodotalk.infra.database.entities.RefreshTokenEntity
 import com.dothebestmayb.dodotalk.infra.database.entities.UserEntity
 import com.dothebestmayb.dodotalk.infra.database.mapper.toUser

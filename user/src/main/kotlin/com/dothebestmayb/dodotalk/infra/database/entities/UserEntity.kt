@@ -1,6 +1,6 @@
 package com.dothebestmayb.dodotalk.infra.database.entities
 
-import com.dothebestmayb.dodotalk.domain.model.UserId
+import com.dothebestmayb.dodotalk.domain.type.UserId
 import com.dothebestmayb.dodotalk.infra.database.converters.EmailAttributeConverter
 import jakarta.persistence.Column
 import jakarta.persistence.Convert

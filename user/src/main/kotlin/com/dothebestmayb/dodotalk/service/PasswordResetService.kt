@@ -4,7 +4,7 @@ import com.dothebestmayb.dodotalk.domain.exception.InvalidCredentialsException
 import com.dothebestmayb.dodotalk.domain.exception.InvalidTokenException
 import com.dothebestmayb.dodotalk.domain.exception.SamePasswordException
 import com.dothebestmayb.dodotalk.domain.exception.UserNotFoundException
-import com.dothebestmayb.dodotalk.domain.model.UserId
+import com.dothebestmayb.dodotalk.domain.type.UserId
 import com.dothebestmayb.dodotalk.infra.database.entities.PasswordResetTokenEntity
 import com.dothebestmayb.dodotalk.infra.database.repositories.PasswordResetTokenRepository
 import com.dothebestmayb.dodotalk.infra.database.repositories.RefreshTokenRepository

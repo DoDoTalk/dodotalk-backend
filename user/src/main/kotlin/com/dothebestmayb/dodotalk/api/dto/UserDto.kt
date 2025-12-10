@@ -1,6 +1,6 @@
 package com.dothebestmayb.dodotalk.api.dto
 
-import com.dothebestmayb.dodotalk.domain.model.UserId
+import com.dothebestmayb.dodotalk.domain.type.UserId
 
 data class UserDto(
     val id: UserId,
