@@ -1,5 +1,6 @@
 package com.dothebestmayb.dodotalk.service
 
+import com.dothebestmayb.dodotalk.domain.events.user.UserEvent
 import com.dothebestmayb.dodotalk.domain.exception.InvalidCredentialsException
 import com.dothebestmayb.dodotalk.domain.exception.InvalidTokenException
 import com.dothebestmayb.dodotalk.domain.exception.SamePasswordException
@@ -9,6 +10,7 @@ import com.dothebestmayb.dodotalk.infra.database.entities.PasswordResetTokenEnti
 import com.dothebestmayb.dodotalk.infra.database.repositories.PasswordResetTokenRepository
 import com.dothebestmayb.dodotalk.infra.database.repositories.RefreshTokenRepository
 import com.dothebestmayb.dodotalk.infra.database.repositories.UserRepository
+import com.dothebestmayb.dodotalk.infra.message_queue.EventPublisher
 import com.dothebestmayb.dodotalk.infra.security.PasswordEncoder
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
@@ -26,6 +28,7 @@ class PasswordResetService(
     @param:Value("\${dodotalk.email.reset-password.expiry-minutes}")
     private val expiryMinutes: Long,
     private val refreshTokenRepository: RefreshTokenRepository,
+    private val eventPublisher: EventPublisher,
 ) {
     @Transactional
     fun requestPasswordReset(email: String) {
@@ -39,7 +42,15 @@ class PasswordResetService(
         )
         passwordResetTokenRepository.save(token)
 
-        // TODO : Inform notification service about password reset trigger to send email
+        eventPublisher.publish(
+            event = UserEvent.RequestResetPassword(
+                userId = user.id!!,
+                email = user.email,
+                username = user.username,
+                passwordResetToken = token.token,
+                expiresInMinutes = expiryMinutes,
+            )
+        )
     }
 
     @Transactional
