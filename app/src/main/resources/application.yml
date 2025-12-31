@@ -96,6 +96,7 @@ jwt:
 dodotalk:
   email:
     from: ${MAILGUN_USERNAME}
+    url: ${SERVER_DEFAULT_URL}
     verification:
       expiry-hours: 1
     reset-password:

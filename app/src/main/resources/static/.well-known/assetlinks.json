@@ -1,0 +1,16 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.dothebestmayb.dodotalk",
+      "sha256_cert_fingerprints": [
+        "9C:BB:25:32:22:1C:E6:31:EB:BD:B0:19:09:92:91:82:7D:D5:8D:8D:26:B1:39:E3:23:7B:2A:DE:7A:D2:BC:15",
+        "B2:AA:7C:1D:2C:6B:04:46:82:90:0E:8D:06:80:09:BB:A6:EF:B7:30:AA:E8:4F:11:A0:10:D7:FB:50:61:58:2F"
+      ]
+    }
+  }
+]

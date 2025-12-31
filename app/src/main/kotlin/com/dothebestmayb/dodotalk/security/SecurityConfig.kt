@@ -25,11 +25,13 @@ class SecurityConfig {
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/api/auth/**")
+                    .requestMatchers("/.well-known/**")
                     .permitAll()
                     // change-password api를 요청할 때, JWT token이 첨부되었는지 SpringBoot가 확인하도록 설정
                     .requestMatchers("/api/auth/change-password")
                     .authenticated()
+                    .requestMatchers("/api/auth/**")
+                    .permitAll()
                     .dispatcherTypeMatchers(
                         DispatcherType.ERROR,
                         DispatcherType.FORWARD

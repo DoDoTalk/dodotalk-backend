@@ -10,8 +10,6 @@ nginx:
   require-proxy: true
 
 dodotalk:
-  email:
-    url: ${SERVER_DEFAULT_URL}
   rate-limit:
     ip:
       apply-limit: true

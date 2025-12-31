@@ -10,8 +10,6 @@ nginx:
   require-proxy: false
 
 dodotalk:
-  email:
-    url: "http://localhost:8080"
   rate-limit:
     ip:
-      apply-limit: false
+      apply-limit: true
