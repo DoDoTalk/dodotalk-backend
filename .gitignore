@@ -38,3 +38,6 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+### SSL ###
+ssl/*.p12
