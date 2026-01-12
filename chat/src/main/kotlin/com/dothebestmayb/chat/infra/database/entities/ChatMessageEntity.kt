@@ -50,7 +50,7 @@ class ChatMessageEntity(
     )
     // non-null로 선언하면 Hibernate가 auto populate 하기 위한 기본 값을 요구한다.
     var chat: ChatEntity? = null,
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
         name = "sender_id",
         nullable = false,
