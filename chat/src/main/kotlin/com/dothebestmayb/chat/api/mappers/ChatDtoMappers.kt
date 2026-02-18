@@ -1,4 +1,4 @@
-package com.dothebestmayb.chat.api.controllers
+package com.dothebestmayb.chat.api.mappers
 
 import com.dothebestmayb.chat.api.dto.ChatDto
 import com.dothebestmayb.chat.api.dto.ChatMessageDto

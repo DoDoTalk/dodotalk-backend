@@ -2,6 +2,7 @@ package com.dothebestmayb.chat.api.controllers
 
 import com.dothebestmayb.chat.api.dto.ChatDto
 import com.dothebestmayb.chat.api.dto.CreateChatRequest
+import com.dothebestmayb.chat.api.mappers.toChatDto
 import com.dothebestmayb.chat.service.ChatService
 import com.dothebestmayb.dodotalk.api.util.requestUserId
 import jakarta.validation.Valid

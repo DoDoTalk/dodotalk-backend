@@ -24,6 +24,15 @@ fun ChatParticipantEntity.toChatParticipant(): ChatParticipant {
         userId = userId,
         username = username,
         email = email,
-        profilePictureUrl = profilePicture,
+        profilePictureUrl = profilePictureUrl,
+    )
+}
+
+fun ChatParticipant.toChatParticipantEntity(): ChatParticipantEntity {
+    return ChatParticipantEntity(
+        userId = userId,
+        username = username,
+        email = email,
+        profilePictureUrl = profilePictureUrl,
     )
 }
