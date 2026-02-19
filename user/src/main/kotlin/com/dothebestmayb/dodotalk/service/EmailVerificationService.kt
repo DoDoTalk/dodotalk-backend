@@ -6,6 +6,7 @@ import com.dothebestmayb.dodotalk.domain.exception.UserNotFoundException
 import com.dothebestmayb.dodotalk.domain.model.EmailVerificationToken
 import com.dothebestmayb.dodotalk.infra.database.entities.EmailVerificationTokenEntity
 import com.dothebestmayb.dodotalk.infra.database.mapper.toEmailVerificationToken
+import com.dothebestmayb.dodotalk.infra.database.mapper.toUser
 import com.dothebestmayb.dodotalk.infra.database.repositories.EmailVerificationTokenRepository
 import com.dothebestmayb.dodotalk.infra.database.repositories.UserRepository
 import com.dothebestmayb.dodotalk.infra.message_queue.EventPublisher
@@ -79,6 +80,14 @@ class EmailVerificationService(
             verificationToken.user.apply {
                 this.hasVerifiedEmail = true
             }
+        )
+
+        eventPublisher.publish(
+            event = UserEvent.Verified(
+                userId = verificationToken.user.id!!,
+                email = verificationToken.user.email,
+                username = verificationToken.user.username,
+            )
         )
     }
 
