@@ -14,8 +14,8 @@ import java.time.Instant
     name = "chat_participants",
     schema = "chat_service",
     indexes = [
-        Index(name = "idx_chat_particpant_username", columnList = "username"),
-        Index(name = "idx_chat_particpant_email", columnList = "emIl"),
+        Index(name = "idx_chat_participant_username", columnList = "username"),
+        Index(name = "idx_chat_participant_email", columnList = "email"),
     ]
 )
 class ChatParticipantEntity(

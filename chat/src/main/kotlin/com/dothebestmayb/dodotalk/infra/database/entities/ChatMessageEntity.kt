@@ -13,6 +13,8 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import java.time.Instant
 
 @Entity
@@ -48,6 +50,7 @@ class ChatMessageEntity(
         insertable = false,
         updatable = false,
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     // non-null로 선언하면 Hibernate가 auto populate 하기 위한 기본 값을 요구한다.
     var chat: ChatEntity? = null,
     @ManyToOne(fetch = FetchType.EAGER)
@@ -57,7 +60,7 @@ class ChatMessageEntity(
         insertable = false,
         updatable = false,
     )
-    var sender: ChatParticipantEntity? = null,
+    var sender: ChatParticipantEntity,
     @CreationTimestamp
     var createdAt: Instant = Instant.now(),
 )
