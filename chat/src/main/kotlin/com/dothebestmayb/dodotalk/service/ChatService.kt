@@ -1,5 +1,7 @@
 package com.dothebestmayb.dodotalk.service
 
+import com.dothebestmayb.dodotalk.api.dto.ChatMessageDto
+import com.dothebestmayb.dodotalk.api.mappers.toChatMessageDto
 import com.dothebestmayb.dodotalk.domain.constant.ChatConstants
 import com.dothebestmayb.dodotalk.domain.exception.ChatNotFoundException
 import com.dothebestmayb.dodotalk.domain.exception.ChatParticipantNotFoundException
@@ -8,16 +10,18 @@ import com.dothebestmayb.dodotalk.domain.exception.InvalidChatSizeException
 import com.dothebestmayb.dodotalk.domain.models.Chat
 import com.dothebestmayb.dodotalk.domain.models.ChatMessage
 import com.dothebestmayb.dodotalk.domain.type.ChatId
+import com.dothebestmayb.dodotalk.domain.type.UserId
 import com.dothebestmayb.dodotalk.infra.database.entities.ChatEntity
 import com.dothebestmayb.dodotalk.infra.database.mappers.toChat
-import com.dothebestmayb.dodotalk.infra.database.repositories.ChatParticipantRepository
-import com.dothebestmayb.dodotalk.infra.database.repositories.ChatRepository
-import com.dothebestmayb.dodotalk.domain.type.UserId
 import com.dothebestmayb.dodotalk.infra.database.mappers.toChatMessage
 import com.dothebestmayb.dodotalk.infra.database.repositories.ChatMessageRepository
+import com.dothebestmayb.dodotalk.infra.database.repositories.ChatParticipantRepository
+import com.dothebestmayb.dodotalk.infra.database.repositories.ChatRepository
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 
 @Service
 class ChatService(
@@ -25,6 +29,26 @@ class ChatService(
     private val chatParticipantRepository: ChatParticipantRepository,
     private val chatMessageRepository: ChatMessageRepository,
 ) {
+
+    /**
+     * @return ChatMessage는 Sender의 상세 정보도 포함하며, 이것을 ChatMessage와 함께 캐싱하는 것을 원하지 않음
+     *  따라서 sender의 id만 포함하는 ChatMessageDto를 리턴함
+     */
+    fun getChatMessages(
+        chatId: ChatId,
+        before: Instant?,
+        pageSize: Int,
+    ): List<ChatMessageDto> {
+        return chatMessageRepository
+            .findByChatIdBefore(
+                chatId = chatId,
+                before = before ?: Instant.now(),
+                pageable = PageRequest.of(0, pageSize)
+            )
+            .content
+            .asReversed() // 최신 메시지가 하단에 보이도록 하기 위해 순서 변경
+            .map { it.toChatMessage().toChatMessageDto() }
+    }
 
     @Transactional
     fun createChat(

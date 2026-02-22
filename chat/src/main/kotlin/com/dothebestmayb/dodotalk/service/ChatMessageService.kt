@@ -1,7 +1,5 @@
 package com.dothebestmayb.dodotalk.service
 
-import com.dothebestmayb.dodotalk.api.dto.ChatMessageDto
-import com.dothebestmayb.dodotalk.api.mappers.toChatMessageDto
 import com.dothebestmayb.dodotalk.domain.exception.ChatNotFoundException
 import com.dothebestmayb.dodotalk.domain.exception.ChatParticipantNotFoundException
 import com.dothebestmayb.dodotalk.domain.exception.ForbiddenException
@@ -15,11 +13,9 @@ import com.dothebestmayb.dodotalk.infra.database.mappers.toChatMessage
 import com.dothebestmayb.dodotalk.infra.database.repositories.ChatMessageRepository
 import com.dothebestmayb.dodotalk.infra.database.repositories.ChatParticipantRepository
 import com.dothebestmayb.dodotalk.infra.database.repositories.ChatRepository
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
 
 @Service
 class ChatMessageService(
@@ -27,26 +23,6 @@ class ChatMessageService(
     private val chatMessageRepository: ChatMessageRepository,
     private val chatParticipantRepository: ChatParticipantRepository,
 ) {
-
-    /**
-     * @return ChatMessage는 Sender의 상세 정보도 포함하며, 이것을 ChatMessage와 함께 캐싱하는 것을 원하지 않음
-     *  따라서 sender의 id만 포함하는 ChatMessageDto를 리턴함
-     */
-    fun getChatMessages(
-        chatId: ChatId,
-        before: Instant?,
-        pageSize: Int,
-    ): List<ChatMessageDto> {
-        return chatMessageRepository
-            .findByChatIdBefore(
-                chatId = chatId,
-                before = before ?: Instant.now(),
-                pageable = PageRequest.of(0, pageSize)
-            )
-            .content
-            .asReversed() // 최신 메시지가 하단에 보이도록 하기 위해 순서 변경
-            .map { it.toChatMessage().toChatMessageDto() }
-    }
 
     /**
      * @param messageId 메시지를 보낸 사람은 broadcast에 의해 자신도 메시지를 받게 되는데

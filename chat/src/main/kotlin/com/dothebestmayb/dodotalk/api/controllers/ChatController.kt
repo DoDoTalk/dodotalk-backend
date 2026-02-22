@@ -2,24 +2,40 @@ package com.dothebestmayb.dodotalk.api.controllers
 
 import com.dothebestmayb.dodotalk.api.dto.AddParticipantToChatDto
 import com.dothebestmayb.dodotalk.api.dto.ChatDto
+import com.dothebestmayb.dodotalk.api.dto.ChatMessageDto
 import com.dothebestmayb.dodotalk.api.dto.CreateChatRequest
 import com.dothebestmayb.dodotalk.api.mappers.toChatDto
-import com.dothebestmayb.dodotalk.service.ChatService
 import com.dothebestmayb.dodotalk.api.util.requestUserId
 import com.dothebestmayb.dodotalk.domain.type.ChatId
+import com.dothebestmayb.dodotalk.service.ChatService
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.time.Instant
 
 @RestController
 @RequestMapping("/api/chat")
 class ChatController(
     private val chatService: ChatService,
 ) {
+    @GetMapping("/{chatId}/messages")
+    fun getMessagesForChat(
+        @PathVariable chatId: ChatId,
+        @RequestParam("before", required = false) before: Instant? = null,
+        @RequestParam("pageSize", required = false) pageSize: Int = DEFAULT_PAGE_SIZE,
+    ): List<ChatMessageDto> {
+        return chatService.getChatMessages(
+            chatId = chatId,
+            before = before,
+            pageSize = pageSize,
+        )
+    }
 
     @PostMapping()
     fun createChat(
@@ -51,5 +67,9 @@ class ChatController(
             chatId = chatId,
             userId = requestUserId,
         )
+    }
+
+    companion object {
+        private const val DEFAULT_PAGE_SIZE = 20
     }
 }
