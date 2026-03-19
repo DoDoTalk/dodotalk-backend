@@ -3,6 +3,8 @@ package com.dothebestmayb.dodotalk.service
 import com.dothebestmayb.dodotalk.api.dto.ChatMessageDto
 import com.dothebestmayb.dodotalk.api.mappers.toChatMessageDto
 import com.dothebestmayb.dodotalk.domain.constant.ChatConstants
+import com.dothebestmayb.dodotalk.domain.event.ChatParticipantLeftEvent
+import com.dothebestmayb.dodotalk.domain.event.ChatParticipantsJoinedEvent
 import com.dothebestmayb.dodotalk.domain.exception.ChatNotFoundException
 import com.dothebestmayb.dodotalk.domain.exception.ChatParticipantNotFoundException
 import com.dothebestmayb.dodotalk.domain.exception.ForbiddenException
@@ -17,6 +19,7 @@ import com.dothebestmayb.dodotalk.infra.database.mappers.toChatMessage
 import com.dothebestmayb.dodotalk.infra.database.repositories.ChatMessageRepository
 import com.dothebestmayb.dodotalk.infra.database.repositories.ChatParticipantRepository
 import com.dothebestmayb.dodotalk.infra.database.repositories.ChatRepository
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -28,6 +31,7 @@ class ChatService(
     private val chatRepository: ChatRepository,
     private val chatParticipantRepository: ChatParticipantRepository,
     private val chatMessageRepository: ChatMessageRepository,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
 
     /**
@@ -102,6 +106,13 @@ class ChatService(
             }
         ).toChat(lastMessage)
 
+        applicationEventPublisher.publishEvent(
+            ChatParticipantsJoinedEvent(
+                chatId = chatId,
+                userIds = userIds,
+            )
+        )
+
         return updatedChat
     }
 
@@ -130,6 +141,13 @@ class ChatService(
             chat.apply {
                 this.participants = chat.participants - participant
             }
+        )
+
+        applicationEventPublisher.publishEvent(
+            ChatParticipantLeftEvent(
+                chatId = chatId,
+                userId = userId,
+            )
         )
     }
 
