@@ -1,4 +1,4 @@
-package com.dothebestmayb.dodotalk.security
+package com.dothebestmayb.dodotalk.api.security
 
 import com.dothebestmayb.dodotalk.api.config.JwtAuthFilter
 import com.dothebestmayb.dodotalk.service.JwtService

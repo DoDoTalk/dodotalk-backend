@@ -16,6 +16,7 @@ import com.dothebestmayb.dodotalk.infra.database.repositories.ChatMessageReposit
 import com.dothebestmayb.dodotalk.infra.database.repositories.ChatParticipantRepository
 import com.dothebestmayb.dodotalk.infra.database.repositories.ChatRepository
 import com.dothebestmayb.dodotalk.infra.message_queue.EventPublisher
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -36,6 +37,10 @@ class ChatMessageService(
      *  따라서 messageId를 server에서 auto generate 하지 않고 client에서 생성하도록 구성함
      */
     @Transactional
+    @CacheEvict(
+        value = ["messages"],
+        key = "#chatId",
+    )
     fun sendMessage(
         chatId: ChatId,
         senderId: UserId,
@@ -90,5 +95,45 @@ class ChatMessageService(
                 messageId = messageId,
             )
         )
+
+        evictMessagesCache(message.chatId)
     }
+
+    @CacheEvict(
+        value = ["messages"],
+        key = "#chatId"
+    )
+    fun evictMessagesCache(chatId: ChatId) {
+        // NO-OP : Let Spring handle the cache evict
+
+    }
+
+        // deleteMessage에서 채팅에 메시지 변경사항이 있으면 캐싱된 데이터를 삭제하는 다른 방법
+//        @Transactional
+//        @CacheEvict(
+//            value = ["messages"],
+//            key = "#result.chatId", // 리턴되는 ChatMessage의 chatId를 key로 사용함
+//        )
+//        fun deleteMessage(
+//            messageId: ChatMessageId,
+//            requestUserId: UserId,
+//        ): ChatMessage {
+//            val message = chatMessageRepository.findByIdOrNull(messageId)
+//                ?: throw MessageNotFoundException(messageId)
+//
+//            if (message.sender.userId != requestUserId) {
+//                throw ForbiddenException()
+//            }
+//
+//            chatMessageRepository.delete(message)
+//
+//            applicationEventPublisher.publishEvent(
+//                MessageDeletedEvent(
+//                    chatId = message.chatId,
+//                    messageId = messageId,
+//                )
+//            )
+//
+//            return message.toChatMessage()
+//        }
 }

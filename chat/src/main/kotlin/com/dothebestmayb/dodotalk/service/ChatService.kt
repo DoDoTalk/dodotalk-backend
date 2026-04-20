@@ -19,6 +19,7 @@ import com.dothebestmayb.dodotalk.infra.database.mappers.toChatMessage
 import com.dothebestmayb.dodotalk.infra.database.repositories.ChatMessageRepository
 import com.dothebestmayb.dodotalk.infra.database.repositories.ChatParticipantRepository
 import com.dothebestmayb.dodotalk.infra.database.repositories.ChatRepository
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -38,6 +39,12 @@ class ChatService(
      * @return ChatMessage는 Sender의 상세 정보도 포함하며, 이것을 ChatMessage와 함께 캐싱하는 것을 원하지 않음
      *  따라서 sender의 id만 포함하는 ChatMessageDto를 리턴함
      */
+    @Cacheable(
+        value = ["messages"],
+        key = "#chatId",
+        condition = "#before == null && #pageSize <= 50",
+        sync = true,
+    )
     fun getChatMessages(
         chatId: ChatId,
         before: Instant?,
