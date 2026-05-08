@@ -152,7 +152,7 @@ class ChatWebSocketHandler(
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun onJoinChat(event: ChatParticipantsJoinedEvent) {
         connectionLock.write {
-            val joiningSessionsIds = mutableSetOf<String>()
+            val joiningSessionIds = mutableSetOf<String>()
 
             event.userIds.forEach { userId ->
                 userChatIds.compute(userId) { _, chatIds ->
@@ -162,13 +162,13 @@ class ChatWebSocketHandler(
                 }
 
                 userToSessions[userId]?.let { sessionIds ->
-                    joiningSessionsIds.addAll(sessionIds)
+                    joiningSessionIds.addAll(sessionIds)
                 }
             }
 
-            if (joiningSessionsIds.isNotEmpty()) {
+            if (joiningSessionIds.isNotEmpty()) {
                 chatToSessions.compute(event.chatId) { _, sessions ->
-                    (sessions ?: mutableSetOf()).apply { addAll(joiningSessionsIds) }
+                    (sessions ?: mutableSetOf()).apply { addAll(joiningSessionIds) }
                 }
             }
         }
@@ -248,15 +248,21 @@ class ChatWebSocketHandler(
             chatToSessions[chatId]?.toList() ?: emptyList()
         }
 
+        val messageJson = objectMapper.writeValueAsString(message)
+
         chatSessions.forEach { sessionId ->
             val userSession = connectionLock.read {
                 sessions[sessionId]
             } ?: return@forEach
 
-            sendToUser(
-                userId = userSession.userId,
-                message = message,
-            )
+            if (userSession.session.isOpen) {
+                try {
+                    userSession.session.sendMessage(TextMessage(messageJson))
+                    logger.debug("Sent message to user {}: {}", userSession.userId, messageJson)
+                } catch (e: Exception) {
+                    logger.error("Error while sending message to ${userSession.userId}", e)
+                }
+            }
         }
     }
 
@@ -287,26 +293,6 @@ class ChatWebSocketHandler(
                 )
             )
         )
-    }
-
-    private fun sendToUser(userId: UserId, message: OutgoingWebSocketMessage) {
-        val userSessions = connectionLock.read {
-            userToSessions[userId] ?: emptySet()
-        }
-        userSessions.forEach { sessionId ->
-            val userSession = connectionLock.read {
-                sessions[sessionId] ?: return@forEach
-            }
-            if (userSession.session.isOpen) {
-                try {
-                    val messageJson = objectMapper.writeValueAsString(message)
-                    userSession.session.sendMessage(TextMessage(messageJson))
-                    logger.debug("Sent message to user {}: {}", userId, messageJson)
-                } catch (e: Exception) {
-                    logger.error("Error while sending message to $userId", e)
-                }
-            }
-        }
     }
 
     private data class UserSession(
