@@ -13,3 +13,7 @@ dodotalk:
   rate-limit:
     ip:
       apply-limit: true
+  web-socket:
+    allowed-origins:
+      - "${SERVER_DEFAULT_URL}"
+      - "http://localhost:8080"
