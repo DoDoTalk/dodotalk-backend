@@ -1,5 +1,7 @@
 package com.dothebestmayb.dodotalk.api.websocket
 
+import com.dothebestmayb.dodotalk.api.dto.ws.ChatParticipantsChangedDto
+import com.dothebestmayb.dodotalk.api.dto.ws.DeleteMessageDto
 import com.dothebestmayb.dodotalk.api.dto.ws.ErrorDto
 import com.dothebestmayb.dodotalk.api.dto.ws.IncomingWebSocketMessage
 import com.dothebestmayb.dodotalk.api.dto.ws.IncomingWebSocketMessageType
@@ -7,6 +9,9 @@ import com.dothebestmayb.dodotalk.api.dto.ws.OutgoingWebSocketMessage
 import com.dothebestmayb.dodotalk.api.dto.ws.OutgoingWebSocketMessageType
 import com.dothebestmayb.dodotalk.api.dto.ws.SendMessageDto
 import com.dothebestmayb.dodotalk.api.mappers.toChatMessageDto
+import com.dothebestmayb.dodotalk.domain.event.ChatParticipantLeftEvent
+import com.dothebestmayb.dodotalk.domain.event.ChatParticipantsJoinedEvent
+import com.dothebestmayb.dodotalk.domain.event.MessageDeletedEvent
 import com.dothebestmayb.dodotalk.domain.type.ChatId
 import com.dothebestmayb.dodotalk.domain.type.UserId
 import com.dothebestmayb.dodotalk.service.ChatMessageService
@@ -15,6 +20,8 @@ import com.dothebestmayb.dodotalk.service.JwtService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
+import org.springframework.transaction.event.TransactionPhase
+import org.springframework.transaction.event.TransactionalEventListener
 import org.springframework.web.socket.CloseStatus
 import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
@@ -124,6 +131,94 @@ class ChatWebSocketHandler(
                 )
             )
         }
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    fun onDeleteMessage(event: MessageDeletedEvent) {
+        broadcastToChat(
+            chatId = event.chatId,
+            message = OutgoingWebSocketMessage(
+                type = OutgoingWebSocketMessageType.MESSAGE_DELETED,
+                payload = objectMapper.writeValueAsString(
+                    DeleteMessageDto(
+                        chatId = event.chatId,
+                        messageId = event.messageId,
+                    )
+                )
+            )
+        )
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    fun onJoinChat(event: ChatParticipantsJoinedEvent) {
+        connectionLock.write {
+            val joiningSessionsIds = mutableSetOf<String>()
+
+            event.userIds.forEach { userId ->
+                userChatIds.compute(userId) { _, chatIds ->
+                    (chatIds ?: mutableSetOf()).apply {
+                        add(event.chatId)
+                    }
+                }
+
+                userToSessions[userId]?.let { sessionIds ->
+                    joiningSessionsIds.addAll(sessionIds)
+                }
+            }
+
+            if (joiningSessionsIds.isNotEmpty()) {
+                chatToSessions.compute(event.chatId) { _, sessions ->
+                    (sessions ?: mutableSetOf()).apply { addAll(joiningSessionsIds) }
+                }
+            }
+        }
+
+        // client에게 어떤 event가 있는지 알려주는 것이 아니라, 대화 내역 갱신이 필요함을 알린다.
+        // 이렇게 함으로써, 채팅 참여, 삭제, 수정 등에 대해 분기 처리 없이 "갱신" 한 개로 처리 가능하다.
+        broadcastToChat(
+            chatId = event.chatId,
+            message = OutgoingWebSocketMessage(
+                type = OutgoingWebSocketMessageType.CHAT_PARTICIPANTS_CHANGED,
+                payload = objectMapper.writeValueAsString(
+                    ChatParticipantsChangedDto(
+                        chatId = event.chatId,
+                    )
+                )
+            )
+        )
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    fun onLeftChat(event: ChatParticipantLeftEvent) {
+        connectionLock.write {
+            userChatIds.compute(event.userId) { _, chatIds ->
+                chatIds
+                    ?.apply { remove(event.chatId) }
+                    ?.takeIf { it.isNotEmpty() }
+            }
+
+            val leavingSessionIds = userToSessions[event.userId] ?: emptySet()
+
+            chatToSessions.compute(event.chatId) { _, sessions ->
+                sessions
+                    ?.apply { removeAll(leavingSessionIds) }
+                    ?.takeIf { it.isNotEmpty() }
+            }
+        }
+
+        // client에게 어떤 event가 있는지 알려주는 것이 아니라, 대화 내역 갱신이 필요함을 알린다.
+        // 이렇게 함으로써, 채팅 참여, 삭제, 수정 등에 대해 분기 처리 없이 "갱신" 한 개로 처리 가능하다.
+        broadcastToChat(
+            chatId = event.chatId,
+            message = OutgoingWebSocketMessage(
+                type = OutgoingWebSocketMessageType.CHAT_PARTICIPANTS_CHANGED,
+                payload = objectMapper.writeValueAsString(
+                    ChatParticipantsChangedDto(
+                        chatId = event.chatId,
+                    )
+                )
+            )
+        )
     }
 
     private fun sendError(
