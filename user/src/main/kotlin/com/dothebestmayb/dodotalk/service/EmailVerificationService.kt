@@ -92,6 +92,7 @@ class EmailVerificationService(
     }
 
     @Scheduled(cron = "0 0 * * * *", zone = "\${dodotalk.scheduling.time-zone}")
+    @Transactional
     fun cleanUpExpiredTokens() {
         emailVerificationTokenRepository.deleteByExpiresAtLessThan(
             now = Instant.now()

@@ -115,6 +115,7 @@ class PasswordResetService(
     }
 
     @Scheduled(cron = "0 0 3 * * *", zone = "\${dodotalk.scheduling.time-zone}")
+    @Transactional
     fun cleanupExpiredTokens() {
         passwordResetTokenRepository.deleteByExpiresAtLessThan(
             Instant.now()
